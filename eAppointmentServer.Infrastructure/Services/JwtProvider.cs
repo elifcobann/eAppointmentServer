@@ -30,7 +30,7 @@ internal sealed class JwtProvider : IJwtProvider
             claims: claims,
             notBefore: DateTime.Now,
             expires: expires,
-            signingCredentials: null);
+            signingCredentials: signingCredentials);
 
         JwtSecurityTokenHandler handler = new();
         string token = handler.WriteToken(securityToken);

@@ -1,13 +1,10 @@
-﻿using eAppointmentServer.Application.Services;
-using eAppointmentServer.Domain.Entities;
-using eAppointmentServer.Domain.Repositories;
+﻿using eAppointmentServer.Domain.Entities;
 using eAppointmentServer.Infrastructure.Context;
-using eAppointmentServer.Infrastructure.Repositories;
-using eAppointmentServer.Infrastructure.Services;
 using GenericRepository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Scrutor;
 
 namespace eAppointmentServer.Infrastructure;
 
@@ -20,8 +17,8 @@ public static class DependencyInjection
             options.UseSqlServer(configuration.GetConnectionString("SqlServer"));
         });
 
-        services.AddIdentity<AppUser, AppRole>( action =>
-        {           
+        services.AddIdentity<AppUser, AppRole>(action =>
+        {
             action.Password.RequireDigit = false;
             action.Password.RequireLowercase = false;
             action.Password.RequireUppercase = false;
@@ -29,12 +26,20 @@ public static class DependencyInjection
             action.Password.RequiredLength = 1;
         }).AddEntityFrameworkStores<ApplicationDbContext>();
 
-        services.AddScoped<IAppointmentRepository, AppointmentRepositoy>();
-        services.AddScoped<IDoctorRepository, DoctorRepositoy>();
-        services.AddScoped<IPatientRepository, PatientRepositoy>();
         services.AddScoped<IUnitOfWork>(srv => srv.GetRequiredService<ApplicationDbContext>());
 
-        services.AddScoped<IJwtProvider, JwtProvider>();
+        services.Scan(action =>
+        {
+            action
+            .FromAssemblies(typeof(DependencyInjection).Assembly)
+            .AddClasses(publicOnly: false)
+            .UsingRegistrationStrategy(registrationStrategy: RegistrationStrategy.Skip)
+            .AsImplementedInterfaces()
+            .WithScopedLifetime();
+        });
+
+        // scrutor kütüphanesi kullanıldı
+
 
         return services;
     }
