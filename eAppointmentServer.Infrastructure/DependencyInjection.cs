@@ -1,5 +1,7 @@
-﻿using eAppointmentServer.Domain.Entities;
+﻿using eAppointmentServer.Application.Services;
+using eAppointmentServer.Domain.Entities;
 using eAppointmentServer.Infrastructure.Context;
+using eAppointmentServer.Infrastructure.Services;
 using GenericRepository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -39,7 +41,7 @@ public static class DependencyInjection
         });
 
         // scrutor kütüphanesi kullanıldı
-
+        services.AddScoped<IJwtProvider, JwtProvider>();
 
         return services;
     }
